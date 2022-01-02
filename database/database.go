@@ -17,9 +17,15 @@ func GetDbConnection() *sql.DB {
 }
 
 func WriteToDatabase(data *structs.TrackerData, connection *sql.DB) {
-	_, err := connection.Query("UPDATE trackers SET lat = ?, lng = ?  where imei = ?", data.Lat, data.Long, data.Imei)
+	rows, err := connection.Query("UPDATE trackers SET lat = ?, lng = ?  where imei = ?", data.Lat, data.Long, data.Imei)
 
 	if err != nil {
-		panic(err)
+		return
+	}
+
+	err = rows.Close()
+
+	if err != nil {
+		return
 	}
 }
