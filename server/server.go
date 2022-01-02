@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-func StartServer(address string, handle func(data structs.TrackerData)) {
+func StartServer(address string, handle func(data *structs.TrackerData)) {
 	ln, _ := net.Listen("tcp", address)
 
 	for {
@@ -39,7 +39,7 @@ func StartServer(address string, handle func(data structs.TrackerData)) {
 	}
 }
 
-func parse(rawData string) structs.TrackerData {
+func parse(rawData string) *structs.TrackerData {
 	data := strings.Split(strings.TrimSpace(rawData), ",")
 
 	trackerData := structs.TrackerData{
@@ -48,7 +48,7 @@ func parse(rawData string) structs.TrackerData {
 		Long: fixLong(data[7]),
 	}
 
-	return trackerData
+	return &trackerData
 }
 
 func fixLat(lat string) string {

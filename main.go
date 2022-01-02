@@ -20,7 +20,7 @@ func main() {
 
 	dbConnection := database.GetDbConnection()
 
-	server.StartServer(":"+os.Getenv("SERVER_PORT"), func(data structs.TrackerData) {
+	server.StartServer(":"+os.Getenv("SERVER_PORT"), func(data *structs.TrackerData) {
 		go database.WriteToDatabase(data, dbConnection)
 	})
 }

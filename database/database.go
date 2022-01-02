@@ -16,7 +16,7 @@ func GetDbConnection() *sql.DB {
 	return dbConnection
 }
 
-func WriteToDatabase(data structs.TrackerData, connection *sql.DB) {
+func WriteToDatabase(data *structs.TrackerData, connection *sql.DB) {
 	_, err := connection.Query("UPDATE trackers SET lat = ?, lng = ?  where imei = ?", data.Lat, data.Long, data.Imei)
 
 	if err != nil {
