@@ -17,16 +17,20 @@ func StartServer(address string, handle func(data structs.TrackerData)) {
 			panic(err)
 		}
 
-		buffer := make([]byte, 96)
-
 		go func() {
+			buffer := make([]byte, 96)
+
 			n, err := conn.Read(buffer)
 
 			if err != nil {
 				return
 			}
 
-			conn.Close()
+			err = conn.Close()
+
+			if err != nil {
+				return
+			}
 
 			data := parse(string(buffer[:n]))
 
