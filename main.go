@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/joho/godotenv"
 	_ "github.com/joho/godotenv"
@@ -11,11 +12,11 @@ import (
 )
 
 func main() {
+	fmt.Println("Hello Akmal")
+
 	err := godotenv.Load()
 	if err != nil {
-		if err != nil {
-			panic(err)
-		}
+		panic(err)
 	}
 
 	dbConnection := database.GetDbConnection()
