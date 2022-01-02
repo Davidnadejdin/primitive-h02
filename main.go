@@ -8,8 +8,12 @@ import (
 	"h02/database"
 	"h02/server"
 	"h02/structs"
+	"h02/ws"
 	"os"
 )
+
+var dbConnection = database.GetDbConnection()
+var updatesChannel = make(chan *structs.TrackerData)
 
 func main() {
 	fmt.Println("Hello Akmal")
@@ -19,9 +23,11 @@ func main() {
 		panic(err)
 	}
 
-	dbConnection := database.GetDbConnection()
+	go ws.StartServer(updatesChannel)
 
 	server.StartServer(":"+os.Getenv("SERVER_PORT"), func(data *structs.TrackerData) {
 		go database.WriteToDatabase(data, dbConnection)
+
+		updatesChannel <- data
 	})
 }
