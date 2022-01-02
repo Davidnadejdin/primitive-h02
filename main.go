@@ -11,7 +11,12 @@ import (
 )
 
 func main() {
-	godotenv.Load()
+	err := godotenv.Load()
+	if err != nil {
+		if err != nil {
+			panic(err)
+		}
+	}
 
 	dbConnection := database.GetDbConnection()
 
