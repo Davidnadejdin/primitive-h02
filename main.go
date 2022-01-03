@@ -14,7 +14,7 @@ import (
 )
 
 var dbConnection = database.GetDbConnection()
-var updatesChannel = make(chan *structs.TrackerData)
+var updatesChannel = make(chan *structs.TrackerData, 10)
 
 func main() {
 	fmt.Println("Hello Akmal")
