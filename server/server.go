@@ -2,19 +2,25 @@ package server
 
 import (
 	"h02/structs"
+	"log"
 	"net"
 	"strconv"
 	"strings"
 )
 
 func StartServer(address string, handle func(data *structs.TrackerData)) {
-	ln, _ := net.Listen("tcp", address)
+	ln, err := net.Listen("tcp", address)
+
+	if err != nil {
+		log.Fatalln(err)
+	}
 
 	for {
 		conn, err := ln.Accept()
 
 		if err != nil {
-			panic(err)
+			log.Println(err)
+			continue
 		}
 
 		go func() {
@@ -23,12 +29,14 @@ func StartServer(address string, handle func(data *structs.TrackerData)) {
 			n, err := conn.Read(buffer)
 
 			if err != nil {
+				log.Fatal(err)
 				return
 			}
 
 			err = conn.Close()
 
 			if err != nil {
+				log.Println(err)
 				return
 			}
 
@@ -59,13 +67,13 @@ func fixLat(lat string) string {
 	minutes, err := strconv.ParseFloat(lat[2:9], 64)
 
 	if err != nil {
-		panic(err)
+		log.Fatalln(err)
 	}
 
 	degrees, err := strconv.ParseFloat(lat[0:2], 64)
 
 	if err != nil {
-		panic(err)
+		log.Fatalln(err)
 	}
 
 	return strconv.FormatFloat(degrees+(minutes/60), 'f', 6, 64)
@@ -75,13 +83,13 @@ func fixLong(lat string) string {
 	minutes, err := strconv.ParseFloat(lat[3:10], 64)
 
 	if err != nil {
-		panic(err)
+		log.Fatalln(err)
 	}
 
 	degrees, err := strconv.ParseFloat(lat[0:3], 64)
 
 	if err != nil {
-		panic(err)
+		log.Fatalln(err)
 	}
 
 	return strconv.FormatFloat(degrees+(minutes/60), 'f', 6, 64)

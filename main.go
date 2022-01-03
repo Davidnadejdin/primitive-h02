@@ -9,6 +9,7 @@ import (
 	"h02/server"
 	"h02/structs"
 	"h02/ws"
+	"log"
 	"os"
 )
 
@@ -20,7 +21,7 @@ func main() {
 
 	err := godotenv.Load()
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 	go ws.StartServer(updatesChannel)

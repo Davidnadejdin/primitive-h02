@@ -6,6 +6,7 @@ import (
 	"flag"
 	"github.com/gorilla/websocket"
 	"h02/structs"
+	"log"
 	"net/http"
 )
 
@@ -25,7 +26,10 @@ func StartServer(updatesChannel chan *structs.TrackerData) {
 
 	http.HandleFunc("/", server.echo)
 
-	http.ListenAndServe(*addr, nil)
+	err := http.ListenAndServe(*addr, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func (server *Server) echo(w http.ResponseWriter, r *http.Request) {
@@ -36,6 +40,15 @@ func (server *Server) echo(w http.ResponseWriter, r *http.Request) {
 	for {
 		jsoned, _ := json.Marshal(<-server.updatesChannel)
 
-		connection.WriteMessage(1, jsoned)
+		err := connection.WriteMessage(1, jsoned)
+
+		if err != nil {
+			break
+		}
+	}
+
+	err := connection.Close()
+	if err != nil {
+		log.Println(err)
 	}
 }
