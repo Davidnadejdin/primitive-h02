@@ -42,7 +42,7 @@ func StartServer(address string, handle func(data *structs.TrackerData)) {
 
 			rawData := string(buffer[:n])
 
-			if len(rawData) > 96 {
+			if len(rawData) == 96 {
 				data := parse(rawData)
 
 				handle(data)

@@ -2,12 +2,19 @@ package database
 
 import (
 	"database/sql"
+	"github.com/joho/godotenv"
 	"h02/structs"
 	"log"
 	"os"
 )
 
 func GetDbConnection() *sql.DB {
+	err := godotenv.Load()
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	dbConnection, err := sql.Open("mysql", os.Getenv("DB_USER")+":"+os.Getenv("DB_PASSWORD")+"@/"+os.Getenv("DB_NAME"))
 
 	if err != nil {
