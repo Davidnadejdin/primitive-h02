@@ -11,15 +11,14 @@ import (
 	"os"
 )
 
-var dbConnection = database.GetDbConnection()
-
 func main() {
 	fmt.Println("Hello Akmal")
 
 	wsServer := ws.StartServer()
+	db := database.InitDb()
 
 	server.StartServer(":"+os.Getenv("SERVER_PORT"), func(data *structs.TrackerData) {
 		go wsServer.SendMessage(data)
-		go database.WriteToDatabase(data, dbConnection)
+		go db.Write(data)
 	})
 }
