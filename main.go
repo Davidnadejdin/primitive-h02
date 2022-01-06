@@ -12,16 +12,14 @@ import (
 )
 
 var dbConnection = database.GetDbConnection()
-var updatesChannel = make(chan *structs.TrackerData, 10)
 
 func main() {
 	fmt.Println("Hello Akmal")
 
-	go ws.StartServer(updatesChannel)
+	wsServer := ws.StartServer()
 
 	server.StartServer(":"+os.Getenv("SERVER_PORT"), func(data *structs.TrackerData) {
-		updatesChannel <- data
-
+		go wsServer.SendMessage(data)
 		go database.WriteToDatabase(data, dbConnection)
 	})
 }

@@ -11,43 +11,67 @@ import (
 )
 
 var addr = flag.String("addr", "0.0.0.0:1338", "http service address")
-var upgrader = websocket.Upgrader{}
-
-type Server struct {
-	updatesChannel chan *structs.TrackerData
+var upgrader = websocket.Upgrader{
+	CheckOrigin: func(r *http.Request) bool {
+		return true
+	},
 }
 
-func StartServer(updatesChannel chan *structs.TrackerData) {
-	server := Server{
-		updatesChannel: updatesChannel,
-	}
+type Server struct {
+	clients map[*websocket.Conn]bool
+}
 
-	flag.Parse()
+func StartServer() *Server {
+	server := Server{
+		make(map[*websocket.Conn]bool),
+	}
 
 	http.HandleFunc("/", server.echo)
 
-	err := http.ListenAndServe(*addr, nil)
-	if err != nil {
-		log.Fatal(err)
+	go func() {
+		flag.Parse()
+
+		err := http.ListenAndServe(*addr, nil)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}()
+
+	return &server
+}
+
+func (server *Server) SendMessage(data *structs.TrackerData) {
+	for conn := range server.clients {
+		jsoned, _ := json.Marshal(*data)
+
+		err := conn.WriteMessage(1, jsoned)
+
+		if err != nil {
+			log.Println(err)
+		}
 	}
 }
 
 func (server *Server) echo(w http.ResponseWriter, r *http.Request) {
-	upgrader.CheckOrigin = func(r *http.Request) bool { return true }
+	connection, err := upgrader.Upgrade(w, r, nil)
 
-	connection, _ := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		log.Println(err)
+	}
+
+	server.clients[connection] = true
 
 	for {
-		jsoned, _ := json.Marshal(<-server.updatesChannel)
+		mt, _, err := connection.ReadMessage()
 
-		err := connection.WriteMessage(1, jsoned)
-
-		if err != nil {
+		if err != nil || mt == websocket.CloseMessage {
 			break
 		}
 	}
 
-	err := connection.Close()
+	delete(server.clients, connection)
+	err = connection.Close()
+
 	if err != nil {
 		log.Println(err)
 	}
