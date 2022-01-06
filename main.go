@@ -18,7 +18,7 @@ func main() {
 	db := database.InitDb()
 
 	server.StartServer(":"+os.Getenv("SERVER_PORT"), func(data *structs.TrackerData) {
-		go wsServer.SendMessage(data)
 		go db.Write(data)
+		go wsServer.SendMessage(data)
 	})
 }

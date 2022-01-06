@@ -29,7 +29,7 @@ func StartServer(address string, handle func(data *structs.TrackerData)) {
 			n, err := conn.Read(buffer)
 
 			if err != nil {
-				log.Fatal(err)
+				log.Println(err)
 				return
 			}
 
